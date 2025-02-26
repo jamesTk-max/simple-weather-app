@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        body{
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            height: 100vh;
+        }
+        .container{
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .container{
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+        }
+        .container img{
+            width: 25%;
+        }
+        button{
+            background: #000;
+            color: #fff;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img class="logo" src="" alt="">
+        <p class="location"></p>
+        <h1 class="temprature"></h1>
+        <p class="condition"></p>
+        <button class="refreshButton">Refresh</button>
+        <label for="">click the refresh button to get the latest weather updates</label>
+    </div>
+
+    <script>
+
+    const logoImage = document.querySelector('.logo')
+    const locationCity = document.querySelector('.location')
+    const temprature = document.querySelector('.temprature')
+    const condition = document.querySelector('.condition')
+    const refreshButton = document.querySelector('.refreshButton')
+
+
+    let lat;
+    let lon;
+
+    navigator.geolocation.getCurrentPosition(
+        (position)=>{
+            lat = position.coords.latitude
+            lon = position.coords.longitude
+            if (lat && lon) {
+               getLocation(lat, lon)
+                console.log(true);
+                console.log('latitude', lat);
+                console.log('longitude', lon);
+                
+            }
+            
+        },
+        (error)=>{
+            console.log('Erorringg');
+            
+        }
+     )
+
+        navigator.permissions.query({name: 'geolocation'})
+            .then((permission)=>{
+                if(permission.state === 'granted'){
+                    console.log('PERMISSION GRANTED');
+                   
+                }
+                else if(permission.state === 'prompt'){
+                    console.log('PERMISSSION NEEDS TO BE REQUESTED');
+                    
+                }
+                else{
+                    console.log('PERMISSION DENIED');
+                    
+                }
+            })
+
+    
+
+    function getLocation(lat, lon) {
+        console.log('geolocation called with', lat, lon);
+        
+        if (lat === undefined || lon === undefined) {
+            console.error("❌ getLocation was called with undefined values!");
+            return
+        }
+        console.log("✅ Valid lat & lon, proceeding...");
+        const countryNames = {
+                AF: "Afghanistan",
+                AL: "Albania",
+                DZ: "Algeria",
+                AD: "Andorra",
+                AO: "Angola",
+                AR: "Argentina",
+                AM: "Armenia",
+                AU: "Australia",
+                AT: "Austria",
+                AZ: "Azerbaijan",
+                BH: "Bahrain",
+                BD: "Bangladesh",
+                BY: "Belarus",
+                BE: "Belgium",
+                BZ: "Belize",
+                BJ: "Benin",
+                BT: "Bhutan",
+                BO: "Bolivia",
+                BA: "Bosnia and Herzegovina",
+                BW: "Botswana",
+                BR: "Brazil",
+                BN: "Brunei",
+                BG: "Bulgaria",
+                BF: "Burkina Faso",
+                BI: "Burundi",
+                KH: "Cambodia",
+                CM: "Cameroon",
+                CA: "Canada",
+                CV: "Cape Verde",
+                CF: "Central African Republic",
+                TD: "Chad",
+                CL: "Chile",
+                CN: "China",
+                CO: "Colombia",
+                KM: "Comoros",
+                CG: "Congo",
+                CD: "Democratic Republic of the Congo",
+                CR: "Costa Rica",
+                HR: "Croatia",
+                CU: "Cuba",
+                CY: "Cyprus",
+                CZ: "Czech Republic",
+                DK: "Denmark",
+                DJ: "Djibouti",
+                DO: "Dominican Republic",
+                EC: "Ecuador",
+                EG: "Egypt",
+                SV: "El Salvador",
+                GQ: "Equatorial Guinea",
+                ER: "Eritrea",
+                EE: "Estonia",
+                ET: "Ethiopia",
+                FJ: "Fiji",
+                FI: "Finland",
+                FR: "France",
+                GA: "Gabon",
+                GM: "Gambia",
+                GE: "Georgia",
+                DE: "Germany",
+                GH: "Ghana",
+                GR: "Greece",
+                GT: "Guatemala",
+                GN: "Guinea",
+                GY: "Guyana",
+                HT: "Haiti",
+                HN: "Honduras",
+                HU: "Hungary",
+                IS: "Iceland",
+                IN: "India",
+                ID: "Indonesia",
+                IR: "Iran",
+                IQ: "Iraq",
+                IE: "Ireland",
+                IL: "Israel",
+                IT: "Italy",
+                JM: "Jamaica",
+                JP: "Japan",
+                JO: "Jordan",
+                KZ: "Kazakhstan",
+                KE: "Kenya",
+                KI: "Kiribati",
+                KW: "Kuwait",
+                KG: "Kyrgyzstan",
+                LA: "Laos",
+                LV: "Latvia",
+                LB: "Lebanon",
+                LS: "Lesotho",
+                LR: "Liberia",
+                LY: "Libya",
+                LT: "Lithuania",
+                LU: "Luxembourg",
+                MG: "Madagascar",
+                MW: "Malawi",
+                MY: "Malaysia",
+                MV: "Maldives",
+                ML: "Mali",
+                MT: "Malta",
+                MR: "Mauritania",
+                MU: "Mauritius",
+                MX: "Mexico",
+                MD: "Moldova",
+                MC: "Monaco",
+                MN: "Mongolia",
+                ME: "Montenegro",
+                MA: "Morocco",
+                MZ: "Mozambique",
+                MM: "Myanmar",
+                NA: "Namibia",
+                NP: "Nepal",
+                NL: "Netherlands",
+                NZ: "New Zealand",
+                NI: "Nicaragua",
+                NE: "Niger",
+                NG: "Nigeria",
+                NO: "Norway",
+                OM: "Oman",
+                PK: "Pakistan",
+                PA: "Panama",
+                PG: "Papua New Guinea",
+                PY: "Paraguay",
+                PE: "Peru",
+                PH: "Philippines",
+                PL: "Poland",
+                PT: "Portugal",
+                QA: "Qatar",
+                RO: "Romania",
+                RU: "Russia",
+                RW: "Rwanda",
+                SA: "Saudi Arabia",
+                SN: "Senegal",
+                RS: "Serbia",
+                SC: "Seychelles",
+                SL: "Sierra Leone",
+                SG: "Singapore",
+                SK: "Slovakia",
+                SI: "Slovenia",
+                SB: "Solomon Islands",
+                SO: "Somalia",
+                ZA: "South Africa",
+                KR: "South Korea",
+                ES: "Spain",
+                LK: "Sri Lanka",
+                SD: "Sudan",
+                SR: "Suriname",
+                SE: "Sweden",
+                CH: "Switzerland",
+                SY: "Syria",
+                TW: "Taiwan",
+                TJ: "Tajikistan",
+                TZ: "Tanzania",
+                TH: "Thailand",
+                TL: "Timor-Leste",
+                TG: "Togo",
+                TO: "Tonga",
+                TN: "Tunisia",
+                TR: "Turkey",
+                TM: "Turkmenistan",
+                UG: "Uganda",
+                UA: "Ukraine",
+                AE: "United Arab Emirates",
+                GB: "United Kingdom",
+                US: "United States",
+                UY: "Uruguay",
+                UZ: "Uzbekistan",
+                VU: "Vanuatu",
+                VE: "Venezuela",
+                VN: "Vietnam",
+                YE: "Yemen",
+                ZM: "Zambia",
+                ZW: "Zimbabwe"
+};
+        const apiKey = '41bacb155faf7b0521f02046d11b50e9'
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+
+        fetch(url)
+            .then((result)=>{
+                if(!result.ok){
+                    if (response.status === 404) {
+                        throw new Error('Data not found')
+                    }
+                    else if(response.status === 500){
+                        throw new Error('server error')
+                    }
+                    else if(response.status === 400){
+                        throw new Error('Bad Request')
+                    }
+                    else if(response.status === 401){
+                        throw new Error('Unauthorized')
+                    }
+                    else if(response.status === 403){
+                        throw new Error('Forbidden')
+                    }
+                    else if(response.status === 408){
+                        throw new Error('Request Timeout')
+                    }
+                    else if(response.status === 429){
+                        throw new Error('Too Many Requests')
+                    }
+                    else if(response.status === 502){
+                        throw new Error('Bad Gateway')
+                    }
+                    else if(response.status === 503){
+                        throw new Error('Service Unavailable')
+                    }
+                    else if(response.status === 504){
+                        throw new Error('Getway Timeout')
+                    }
+                    
+                }
+                return result.json()
+            })
+            .then((data)=>{
+                
+                const weatherConditionImages = {
+                    // clear sky and some clouds data images
+                    'clear': 'sun.png',
+                    'few clouds': 'sun.png',
+
+                    // cloudy and overcast data images
+                    'scattered clouds': 'cloud.png',
+                    'broken clouds': 'cloud.png',
+                    'overcast clouds': 'cloud.png',
+
+                    // rain and storms data images
+                    "shower rain": 'rain.png',
+                    "rain": 'rain.png',
+                    "thunderstorm": 'rain.png',
+                    "drizzle": 'rain.png',
+                    "mist": 'rain.png',
+
+                    // Snow and Ice data images
+                    "snow": 'snow.png',
+                    "sleet": 'snow.png',
+                    "freezing rain": 'snow.png',
+                    "blizzard": 'snow.png'
+                }
+
+    console.log(data);
+    
+    
+   locationCity.textContent = data.name + ', ' + countryNames[data.sys.country]
+   temprature.textContent = data.main.temp + '°C'
+   logoImage.src = weatherConditionImages[data.weather[0].description]
+   condition.textContent = data.weather[0].description
+
+   const tempNum = parseFloat(temprature.textContent)
+        if(tempNum > 30){
+            document.body.style.backgroundImage = 'url(sunnyBackground.jpg)'
+        }
+        else if(tempNum < 15){
+            document.body.style.backgroundImage = 'url(coldBackground.jpg)'
+        }
+        else{
+            document.body.style.backgroundImage = 'url(mildBackground.jpg)'
+        }
+            })
+            .catch((error)=>{
+                console.error('Error:', error.message);
+            })
+    }
+    
+    refreshButton.addEventListener('click', function(){
+        getLocation(lat, lon)
+    })
+
+    window.onload = function(){
+        getLocation(lat, lon)
+    }
+    </script>
+</body>
+</html>
